@@ -12,12 +12,13 @@ export class AlertsService {
         private gateway: TrackingGateway,
     ) { }
 
-    async createAlert(vesselId: string, severity: AlertSeverity, message: string) {
+    async createAlert(vesselId: string, severity: AlertSeverity, message: string, type: string = 'GENERAL') {
         const alert = await this.prisma.alert.create({
             data: {
                 vesselId,
                 severity,
                 message,
+                type,
                 status: 'ACTIVE',
             },
         });

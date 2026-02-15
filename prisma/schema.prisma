@@ -33,6 +33,12 @@ enum AlertSeverity {
   CRITICAL
 }
 
+enum AlertStatus {
+  ACTIVE
+  RESOLVED
+  ACKNOWLEDGED
+}
+
 model Role {
   id        String   @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
   name      String   @unique
@@ -133,8 +139,10 @@ model Alert {
   zone      Zone?         @relation(fields: [zoneId], references: [id])
   type      String
   severity  AlertSeverity @default(MEDIUM)
+  status    AlertStatus   @default(ACTIVE)
   message   String
   timestamp DateTime      @default(now())
+  resolvedAt DateTime?
 
   @@index([vesselId])
   @@index([tripId])

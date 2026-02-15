@@ -1,4 +1,5 @@
-export interface LocationUpdatePayload {
+export class LocationUpdatePayload {
+  vesselId: string;
   tripId: string;
   latitude: number;
   longitude: number;
@@ -7,7 +8,8 @@ export interface LocationUpdatePayload {
   timestamp: Date;
 }
 
-export interface SosTriggerPayload {
+export class SosTriggerPayload {
+  vesselId: string;
   tripId: string;
   message?: string;
   timestamp: Date;
