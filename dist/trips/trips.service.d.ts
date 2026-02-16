@@ -21,8 +21,8 @@ export declare class TripsService {
         createdAt: Date;
         updatedAt: Date;
         status: import(".prisma/client").$Enums.TripStatus;
+        vesselId: string;
         startTime: Date | null;
         endTime: Date | null;
-        vesselId: string;
     })[]>;
 }

@@ -9,12 +9,17 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.LocationModule = void 0;
 const common_1 = require("@nestjs/common");
 const location_controller_1 = require("./location.controller");
+const location_service_1 = require("./location.service");
+const redis_module_1 = require("../redis/redis.module");
 let LocationModule = class LocationModule {
 };
 exports.LocationModule = LocationModule;
 exports.LocationModule = LocationModule = __decorate([
     (0, common_1.Module)({
-        controllers: [location_controller_1.LocationController]
+        imports: [redis_module_1.RedisModule],
+        controllers: [location_controller_1.LocationController],
+        providers: [location_service_1.LocationService],
+        exports: [location_service_1.LocationService],
     })
 ], LocationModule);
 //# sourceMappingURL=location.module.js.map

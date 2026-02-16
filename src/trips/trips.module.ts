@@ -1,11 +1,12 @@
 import { Module } from '@nestjs/common';
 import { TripsService } from './trips.service';
 import { TripsController } from './trips.controller';
-import { LocationService } from './location.service';
-import { AlertsService } from './alerts.service';
+import { LocationModule } from '../location/location.module';
+import { AlertsModule } from '../alerts/alerts.module';
 
 @Module({
-  providers: [TripsService, LocationService, AlertsService],
-  controllers: [TripsController]
+  imports: [LocationModule, AlertsModule],
+  providers: [TripsService],
+  controllers: [TripsController],
 })
-export class TripsModule {}
+export class TripsModule { }

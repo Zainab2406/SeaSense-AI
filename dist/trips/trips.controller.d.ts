@@ -8,9 +8,9 @@ export declare class TripsController {
         createdAt: Date;
         updatedAt: Date;
         status: import(".prisma/client").$Enums.TripStatus;
+        vesselId: string;
         startTime: Date | null;
         endTime: Date | null;
-        vesselId: string;
     }>;
     endTrip(tripId: string, endTime: string): Promise<{
         id: string;
@@ -18,9 +18,9 @@ export declare class TripsController {
         createdAt: Date;
         updatedAt: Date;
         status: import(".prisma/client").$Enums.TripStatus;
+        vesselId: string;
         startTime: Date | null;
         endTime: Date | null;
-        vesselId: string;
     }>;
     getHistory(vesselId: string): Promise<({
         points: {
@@ -38,8 +38,8 @@ export declare class TripsController {
         createdAt: Date;
         updatedAt: Date;
         status: import(".prisma/client").$Enums.TripStatus;
+        vesselId: string;
         startTime: Date | null;
         endTime: Date | null;
-        vesselId: string;
     })[]>;
 }

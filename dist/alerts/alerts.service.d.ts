@@ -10,25 +10,25 @@ export declare class AlertsService {
         message: string;
         type: string;
         id: string;
-        status: import(".prisma/client").$Enums.AlertStatus;
-        vesselId: string;
         severity: import(".prisma/client").$Enums.AlertSeverity;
+        status: import(".prisma/client").$Enums.AlertStatus;
         timestamp: Date;
         resolvedAt: Date | null;
         tripId: string | null;
         zoneId: string | null;
+        vesselId: string;
     }>;
     resolveAlert(alertId: string): Promise<{
         message: string;
         type: string;
         id: string;
-        status: import(".prisma/client").$Enums.AlertStatus;
-        vesselId: string;
         severity: import(".prisma/client").$Enums.AlertSeverity;
+        status: import(".prisma/client").$Enums.AlertStatus;
         timestamp: Date;
         resolvedAt: Date | null;
         tripId: string | null;
         zoneId: string | null;
+        vesselId: string;
     }>;
     checkGeofence(vesselId: string, lat: number, lng: number): Promise<void>;
 }

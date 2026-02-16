@@ -10,15 +10,16 @@ exports.TripsModule = void 0;
 const common_1 = require("@nestjs/common");
 const trips_service_1 = require("./trips.service");
 const trips_controller_1 = require("./trips.controller");
-const location_service_1 = require("./location.service");
-const alerts_service_1 = require("./alerts.service");
+const location_module_1 = require("../location/location.module");
+const alerts_module_1 = require("../alerts/alerts.module");
 let TripsModule = class TripsModule {
 };
 exports.TripsModule = TripsModule;
 exports.TripsModule = TripsModule = __decorate([
     (0, common_1.Module)({
-        providers: [trips_service_1.TripsService, location_service_1.LocationService, alerts_service_1.AlertsService],
-        controllers: [trips_controller_1.TripsController]
+        imports: [location_module_1.LocationModule, alerts_module_1.AlertsModule],
+        providers: [trips_service_1.TripsService],
+        controllers: [trips_controller_1.TripsController],
     })
 ], TripsModule);
 //# sourceMappingURL=trips.module.js.map
