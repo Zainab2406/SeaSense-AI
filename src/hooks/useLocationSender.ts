@@ -6,14 +6,14 @@ let watchId: number | null = null;
 export const startLocationWatcher = (tripId: string) => {
   watchId = Geolocation.watchPosition(
     (position) => {
-      const { latitude, longitude, speed } = position.coords;
+      const { latitude, longitude, speed, heading } = position.coords;
 
       socket.emit("location_update", {
         tripId,
         latitude,
         longitude,
         speed,
-        heading: 0,
+        heading: heading || 0,
         timestamp: new Date().toISOString(),
       });
     },
@@ -29,5 +29,14 @@ export const startLocationWatcher = (tripId: string) => {
 export const stopLocationWatcher = () => {
   if (watchId !== null) {
     Geolocation.clearWatch(watchId);
+    watchId = null;
   }
+};
+
+export const sendSOS = (tripId: string, message: string = "Emergency triggered by user") => {
+  socket.emit("sos_triggered", {
+    tripId,
+    message,
+    timestamp: new Date().toISOString(),
+  });
 };

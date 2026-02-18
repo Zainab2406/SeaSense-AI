@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useContext, useEffect } from "react";
 import {
   StatusBar,
   StyleSheet,
@@ -9,90 +9,56 @@ import {
   PermissionsAndroid,
 } from "react-native";
 import { SafeAreaProvider } from "react-native-safe-area-context";
-import Geolocation from "react-native-geolocation-service";
+import { AuthProvider, AuthContext } from "./src/context/AuthContext";
+import { startLocationWatcher, stopLocationWatcher, sendSOS } from "./src/hooks/useLocationSender";
 
-// 🔵 TEMP fake socket + api (replace later with your real ones)
-const socket = {
-  connect: () => console.log("socket connected"),git remote remove origin
-
-  disconnect: () => console.log("socket disconnected"),
-  emit: (event: string, data: any) =>
-    console.log("emit:", event, data),
-};
-
-const api = {
-  post: async (url: string, body?: any) => {
-    console.log("API POST", url, body);
-    return { data: { tripId: "trip_" + Date.now() } };
-  },
-};
-
-export default function App() {
+function AppContent() {
   const isDarkMode = useColorScheme() === "dark";
-  const [tripId, setTripId] = useState<string | null>(null);
-  const watchIdRef = useRef<number | null>(null);
+  const { user, login, logout, startTrip, endTrip, currentTripId } = useContext(AuthContext);
 
   // ✅ permission request
   async function requestPermission() {
-    const granted = await PermissionsAndroid.request(
-      PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION
-    );
-    console.log("Permission:", granted);
+    try {
+      const granted = await PermissionsAndroid.request(
+        PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION
+      );
+      console.log("Permission:", granted);
+    } catch (err) {
+      console.warn(err);
+    }
   }
 
   useEffect(() => {
     requestPermission();
   }, []);
 
-  // ✅ location watcher
-  const startLocationWatcher = (tripId: string) => {
-    const id = Geolocation.watchPosition(
-      (position) => {
-        const { latitude, longitude, speed } = position.coords;
-
-        socket.emit("location_update", {
-          tripId,
-          latitude,
-          longitude,
-          speed,
-          heading: 0,
-          timestamp: new Date().toISOString(),
-        });
-      },
-      (error) => console.log("GPS error", error),
-      {
-        enableHighAccuracy: true,
-        distanceFilter: 5,
-        interval: 5000,
-      }
-    );
-
-    watchIdRef.current = id;
-  };
-
-  // ✅ start trip
-  const startTrip = async () => {
-    const response = await api.post("/trips/start");
-    const id = response.data.tripId;
-
-    setTripId(id);
-    socket.connect();
-    startLocationWatcher(id);
-  };
-
-  // ✅ end trip
-  const endTrip = async () => {
-    if (!tripId) return;
-
-    await api.post("/trips/end", { tripId });
-
-    socket.disconnect();
-
-    if (watchIdRef.current !== null) {
-      Geolocation.clearWatch(watchIdRef.current);
+  const handleLogin = async () => {
+    try {
+      // TODO: Replace with real UI input
+      await login("captain@seasense.com", "secure_password");
+    } catch (e) {
+      console.error(e);
     }
+  };
 
-    setTripId(null);
+  const handleStartTrip = async () => {
+    try {
+      const trip = await startTrip();
+      if (trip) {
+        startLocationWatcher(trip.id);
+      }
+    } catch (e) {
+      console.error(e);
+    }
+  };
+
+  const handleEndTrip = async () => {
+    try {
+      await endTrip();
+      stopLocationWatcher();
+    } catch (e) {
+      console.error(e);
+    }
   };
 
   return (
@@ -102,15 +68,40 @@ export default function App() {
       <View style={styles.container}>
         <Text style={styles.title}>SeaSense Trip Tracker</Text>
 
-        {!tripId ? (
-          <Button title="Start Trip" onPress={startTrip} />
+        {!user ? (
+          <Button title="Login (Dev)" onPress={handleLogin} />
         ) : (
-          <Button title="End Trip" onPress={endTrip} />
-        )}
+          <>
+            <Text>Welcome, {user.email}</Text>
+            <Text>Vessel: {user.vesselId}</Text>
 
-        {tripId && <Text>Active Trip: {tripId}</Text>}
+            <View style={styles.spacer} />
+
+            {!currentTripId ? (
+              <Button title="Start Trip" onPress={handleStartTrip} />
+            ) : (
+              <>
+                <Text style={styles.activeTrip}>Active Trip: {currentTripId}</Text>
+                <Button title="End Trip" onPress={handleEndTrip} color="orange" />
+                <View style={styles.spacer} />
+                <Button title="🆘 SEND SOS 🆘" onPress={() => sendSOS(currentTripId)} color="red" />
+              </>
+            )}
+
+            <View style={styles.spacer} />
+            <Button title="Logout" onPress={logout} color="gray" />
+          </>
+        )}
       </View>
     </SafeAreaProvider>
+  );
+}
+
+export default function App() {
+  return (
+    <AuthProvider>
+      <AppContent />
+    </AuthProvider>
   );
 }
 
@@ -119,10 +110,19 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
-    gap: 20,
+    padding: 20,
   },
   title: {
     fontSize: 22,
     fontWeight: "bold",
+    marginBottom: 20,
+  },
+  activeTrip: {
+    marginBottom: 10,
+    color: "green",
+    fontWeight: "bold",
+  },
+  spacer: {
+    height: 20,
   },
 });
